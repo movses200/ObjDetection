@@ -1,7 +1,2 @@
-first-branch
-/build
-/opencv
-=======
 build/
 opencv/
-main
