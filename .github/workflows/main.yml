@@ -1,0 +1,56 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Allows to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build-tests:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: windows-latest
+            triplet: x64-windows-release
+            build-type: Release
+          - os: ubuntu-latest
+            triplet: x64-linux-release
+            build-type: Release
+          - os: macos-latest
+            triplet: x64-osx-release
+            build-type: Release
+
+    steps:
+      - name: Install Dependencies (Linux)
+        run: sudo apt install libx11-dev libgles2-mesa-dev libdbus-1-dev libxi-dev libxtst-dev libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+        if: matrix.os == 'ubuntu-latest' 
+      
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Restore artifacts, or setup vcpkg for building artifacts
+        uses: lukka/run-vcpkg@v10
+        with:
+          vcpkgDirectory: "${{ github.workspace }}/vcpkg"
+
+      - name: Configure CMake
+        run: |
+          cmake -S . -B make -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
+      - name: Build
+        working-directory: ./make
+        run: |
+          cmake --build . --config ${{ matrix.build-type }} --parallel $(nproc)
