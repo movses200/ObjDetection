@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - name: Install Dependencies (Linux)
-        run: sudo apt install libx11-dev libgles2-mesa-dev libdbus-1-dev libxi-dev libxtst-dev
+        run: sudo apt install libx11-dev libgles2-mesa-dev libdbus-1-dev libxi-dev libxtst-dev libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
         if: matrix.os == 'ubuntu-latest' 
       
       - name: Checkout
