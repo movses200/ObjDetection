@@ -31,7 +31,11 @@ jobs:
             triplet: x64-osx-release
             build-type: Release
 
-    steps:    
+    steps:
+      - name: Install Dependencies (Linux)
+        run: sudo apt install libx11-dev libgles2-mesa-dev libdbus-1-dev libxi-dev libxtst-dev
+        if: matrix.os == 'ubuntu-latest' 
+      
       - name: Checkout
         uses: actions/checkout@v3
         with:
